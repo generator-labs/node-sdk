@@ -11,6 +11,7 @@ import { Exception } from './exception';
 import { RequestHandler } from './api/request-handler';
 import { RBL } from './api/rbl';
 import { Contact } from './api/contact';
+import { Cert } from './api/cert';
 import { ClientConfig, defaultConfig } from './config';
 
 /**
@@ -22,6 +23,7 @@ export class Client {
   private handler: RequestHandler;
   private _rbl?: RBL;
   private _contact?: Contact;
+  private _cert?: Cert;
   public readonly config: Required<ClientConfig>;
 
   /**
@@ -72,5 +74,15 @@ export class Client {
       this._contact = new Contact(this.handler);
     }
     return this._contact;
+  }
+
+  /**
+   * Get the Certificate monitoring API namespace
+   */
+  get cert(): Cert {
+    if (!this._cert) {
+      this._cert = new Cert(this.handler);
+    }
+    return this._cert;
   }
 }
