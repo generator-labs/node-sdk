@@ -18,7 +18,7 @@ client.rbl.hosts.get({ page_size: 10, page: 1 })
   .catch(err => console.error(err));
 
 // Get a single host
-client.rbl.hosts.get('HTee06c4fa7c23aa8a3a4e8d66922b0834')
+client.rbl.hosts.get('HT1a2b3c4d5e6f7890abcdef1234567890')
   .then(data => console.log(data))
   .catch(err => console.error(err));
 
@@ -27,27 +27,27 @@ client.rbl.hosts.create({
   name: 'My Mail Server',
   host: '192.168.1.100',
   type: 'rbl',
-  rbl_profile: 'RP15d4e891d784977cacbfcbb00c48f133',
-  contact_group: 'CG37106c6baa1ec90a2b3f5c8ec54afe9d'
+  rbl_profile: 'RP9f8e7d6c5b4a3210fedcba0987654321',
+  contact_group: 'CG4f3e2d1c0b9a8776655443322110fed'
 })
   .then(data => console.log(data))
   .catch(err => console.error(err));
 
 // Update a host
-client.rbl.hosts.update('HTee06c4fa7c23aa8a3a4e8d66922b0834', {
+client.rbl.hosts.update('HT1a2b3c4d5e6f7890abcdef1234567890', {
   name: 'Updated Mail Server Name'
 })
   .then(data => console.log(data))
   .catch(err => console.error(err));
 
 // Delete a host
-client.rbl.hosts.delete('HTee06c4fa7c23aa8a3a4e8d66922b0834')
+client.rbl.hosts.delete('HT1a2b3c4d5e6f7890abcdef1234567890')
   .then(data => console.log(data))
   .catch(err => console.error(err));
 
 // Pause/Resume a host
-client.rbl.hosts.pause('HTee06c4fa7c23aa8a3a4e8d66922b0834')
-  .then(() => client.rbl.hosts.resume('HTee06c4fa7c23aa8a3a4e8d66922b0834'))
+client.rbl.hosts.pause('HT1a2b3c4d5e6f7890abcdef1234567890')
+  .then(() => client.rbl.hosts.resume('HT1a2b3c4d5e6f7890abcdef1234567890'))
   .then(data => console.log(data))
   .catch(err => console.error(err));
 
@@ -80,17 +80,17 @@ client.rbl.check.start({
     console.log(result);
 
     // Update a contact
-    await client.contact.contacts.update('CT1234567890abcdef', {
+    await client.contact.contacts.update('COabcdef1234567890abcdef1234567890', {
       email: 'updated@example.com'
     });
 
     // Confirm a contact
-    await client.contact.contacts.confirm('CT1234567890abcdef', {
+    await client.contact.contacts.confirm('COabcdef1234567890abcdef1234567890', {
       authcode: '123456'
     });
 
     // Delete a contact
-    await client.contact.contacts.delete('CT1234567890abcdef');
+    await client.contact.contacts.delete('COabcdef1234567890abcdef1234567890');
   } catch (err) {
     console.error(err);
   }
@@ -111,12 +111,12 @@ client.rbl.check.start({
     console.log(result);
 
     // Update a contact group
-    await client.contact.groups.update('CG1234567890abcdef', {
+    await client.contact.groups.update('CG4f3e2d1c0b9a8776655443322110fed', {
       name: 'Updated Group Name'
     });
 
     // Delete a contact group
-    await client.contact.groups.delete('CG1234567890abcdef');
+    await client.contact.groups.delete('CG4f3e2d1c0b9a8776655443322110fed');
   } catch (err) {
     console.error(err);
   }

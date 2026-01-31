@@ -81,7 +81,7 @@ async function main() {
       port: 443,
       protocol: 'https',
       cert_profile: profileId,
-      contact_group: 'CG37106c6baa1ec90a2b3f5c8ec54afe9d' // Use your contact group ID
+      contact_group: 'CG4f3e2d1c0b9a8776655443322110fed' // Use your contact group ID
     });
     console.log(`Created HTTPS monitor ID: ${httpsMonitor.monitor?.id}`);
     const httpsMonitorId = httpsMonitor.monitor?.id!;
@@ -94,7 +94,7 @@ async function main() {
       port: 465,
       protocol: 'smtps',
       cert_profile: profileId,
-      contact_group: 'CG37106c6baa1ec90a2b3f5c8ec54afe9d'
+      contact_group: 'CG4f3e2d1c0b9a8776655443322110fed'
     });
     console.log(`Created SMTPS monitor ID: ${smtpsMonitor.monitor?.id}`);
     const smtpsMonitorId = smtpsMonitor.monitor?.id!;
