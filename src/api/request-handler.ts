@@ -8,7 +8,9 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axiosRetry from 'axios-retry';
 import { Exception } from '../exception';
+import { Client } from '../client';
 
 /**
  * HTTP request handler for the Generator Labs API
@@ -28,9 +30,35 @@ export class RequestHandler {
         password: authToken
       },
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': `GeneratorLabs-Node/${Client.VERSION}`,
+        'Accept': 'application/json'
       },
+      timeout: 30000, // 30 second request timeout
       validateStatus: () => true // Handle all status codes ourselves
+    });
+
+    // Configure retry logic with exponential backoff
+    axiosRetry(this.axiosInstance, {
+      retries: 3, // Maximum number of retries
+      retryDelay: (retryCount) => {
+        // Exponential backoff: 1000ms, 2000ms, 4000ms
+        return 1000 * Math.pow(2, retryCount - 1);
+      },
+      retryCondition: (error) => {
+        // Retry on connection errors
+        if (axiosRetry.isNetworkError(error)) {
+          return true;
+        }
+
+        // Retry on 5xx server errors and 429 rate limit
+        if (error.response) {
+          const status = error.response.status;
+          return status >= 500 || status === 429;
+        }
+
+        return false;
+      }
     });
   }
 
