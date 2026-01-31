@@ -237,6 +237,93 @@ try {
 }
 ```
 
+### Certificate Monitoring
+
+Certificate monitoring allows you to monitor SSL/TLS certificates for expiration, validity, and configuration issues across HTTPS, SMTPS, IMAPS, and other TLS-enabled services.
+
+#### List Certificate Errors
+
+```javascript
+try {
+  // List all certificate errors
+  const errors = await client.cert.errors.get();
+
+  // Get a specific error by ID
+  const error = await client.cert.errors.get('CE1234567890abcdef');
+
+  console.log(errors);
+} catch (err) {
+  console.error(err);
+}
+```
+
+#### Manage Certificate Monitors
+
+```javascript
+try {
+  // List all certificate monitors
+  const monitors = await client.cert.monitors.get();
+
+  // Get a specific monitor
+  const monitor = await client.cert.monitors.get('CM1234567890abcdef');
+
+  // Create a new certificate monitor
+  const monitor = await client.cert.monitors.create({
+    name: 'Production Web Server',
+    hostname: 'example.com',
+    port: 443,
+    protocol: 'https',
+    cert_profile: 'CP1234567890abcdef',
+    contact_group: 'CG1234567890abcdef'
+  });
+
+  // Update a monitor
+  const updatedMonitor = await client.cert.monitors.update('CM1234567890abcdef', {
+    name: 'Updated Server Name'
+  });
+
+  // Delete a monitor
+  await client.cert.monitors.delete('CM1234567890abcdef');
+
+  // Pause monitoring
+  await client.cert.monitors.pause('CM1234567890abcdef');
+
+  // Resume monitoring
+  await client.cert.monitors.resume('CM1234567890abcdef');
+} catch (err) {
+  console.error(err);
+}
+```
+
+#### Manage Certificate Profiles
+
+```javascript
+try {
+  // List all certificate profiles
+  const profiles = await client.cert.profiles.get();
+
+  // Get a specific profile
+  const profile = await client.cert.profiles.get('CP1234567890abcdef');
+
+  // Create a new profile
+  const profile = await client.cert.profiles.create({
+    name: 'Standard Certificate Profile',
+    expiration_warning_days: 30,
+    expiration_critical_days: 7
+  });
+
+  // Update a profile
+  const updatedProfile = await client.cert.profiles.update('CP1234567890abcdef', {
+    expiration_warning_days: 45
+  });
+
+  // Delete a profile
+  await client.cert.profiles.delete('CP1234567890abcdef');
+} catch (err) {
+  console.error(err);
+}
+```
+
 ## API Documentation
 
 Full API documentation is available at the [Generator Labs Developer Site](https://docs.generatorlabs.com/api/v4/).
@@ -257,6 +344,12 @@ The v4.0 API follows a RESTful design with two main resource namespaces:
 
 - **contacts** - List, get, create, update, delete, pause, resume, confirm, and resend contacts
 - **groups** - List, get, create, update, and delete contact groups
+
+### Certificate Namespace (`client.cert`)
+
+- **errors** - List certificate errors and get specific error details
+- **monitors** - List, get, create, update, delete, pause, and resume certificate monitors
+- **profiles** - List, get, create, update, and delete certificate monitoring profiles
 
 ## TypeScript Support
 

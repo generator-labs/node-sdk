@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { Client, Exception, RBL, Contact } from '../src';
+import { Client, Exception, RBL, Contact, Cert } from '../src';
 
 describe('Client', () => {
   describe('constructor', () => {
@@ -53,6 +53,27 @@ describe('Client', () => {
       expect(client.contact).toBeInstanceOf(Contact);
       // Test lazy loading - should return same instance
       expect(client.contact).toBe(client.contact);
+    });
+
+    it('should provide access to Cert namespace', () => {
+      expect(client.cert).toBeInstanceOf(Cert);
+      // Test lazy loading - should return same instance
+      expect(client.cert).toBe(client.cert);
+    });
+
+    it('should provide access to Cert errors endpoint', () => {
+      expect(client.cert.errors).toBeDefined();
+      expect(client.cert.errors).not.toBeNull();
+    });
+
+    it('should provide access to Cert monitors endpoint', () => {
+      expect(client.cert.monitors).toBeDefined();
+      expect(client.cert.monitors).not.toBeNull();
+    });
+
+    it('should provide access to Cert profiles endpoint', () => {
+      expect(client.cert.profiles).toBeDefined();
+      expect(client.cert.profiles).not.toBeNull();
     });
   });
 
