@@ -21,7 +21,7 @@ export interface ClientConfig {
   retryBackoff?: number;
 
   /** Custom API base URL (default: https://api.generatorlabs.com/4.0/) */
-  baseURL?: string;
+  baseUrl?: string;
 }
 
 /**
@@ -31,5 +31,5 @@ export const defaultConfig: Required<ClientConfig> = {
   timeout: 30000,
   maxRetries: 3,
   retryBackoff: 1,
-  baseURL: 'https://api.generatorlabs.com/4.0/'
+  baseUrl: 'https://api.generatorlabs.com/4.0/'
 };

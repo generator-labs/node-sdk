@@ -51,7 +51,7 @@ export class Client {
     this.handler = new RequestHandler(
       accountSid,
       authToken,
-      this.config.baseURL,
+      this.config.baseUrl,
       this.config
     );
   }
