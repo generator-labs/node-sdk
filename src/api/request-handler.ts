@@ -11,18 +11,23 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import axiosRetry from 'axios-retry';
 import { Exception } from '../exception';
 import { Client } from '../client';
+import { ClientConfig, defaultConfig } from '../config';
 
 /**
  * HTTP request handler for the Generator Labs API
  */
 export class RequestHandler {
   private axiosInstance: AxiosInstance;
+  private config: Required<ClientConfig>;
 
   constructor(
     accountSid: string,
     authToken: string,
-    apiUrl: string
+    apiUrl: string,
+    config?: ClientConfig
   ) {
+    this.config = { ...defaultConfig, ...config };
+
     this.axiosInstance = axios.create({
       baseURL: apiUrl,
       auth: {
@@ -34,16 +39,16 @@ export class RequestHandler {
         'User-Agent': `GeneratorLabs-Node/${Client.VERSION}`,
         'Accept': 'application/json'
       },
-      timeout: 30000, // 30 second request timeout
+      timeout: this.config.timeout,
       validateStatus: () => true // Handle all status codes ourselves
     });
 
     // Configure retry logic with exponential backoff
     axiosRetry(this.axiosInstance, {
-      retries: 3, // Maximum number of retries
+      retries: this.config.maxRetries,
       retryDelay: (retryCount) => {
-        // Exponential backoff: 1000ms, 2000ms, 4000ms
-        return 1000 * Math.pow(2, retryCount - 1);
+        // Exponential backoff with configurable factor
+        return 1000 * this.config.retryBackoff * Math.pow(2, retryCount - 1);
       },
       retryCondition: (error) => {
         // Retry on connection errors

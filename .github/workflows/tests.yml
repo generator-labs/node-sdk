@@ -5,6 +5,7 @@ on:
     branches: [ master, main ]
   pull_request:
     branches: [ master, main ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -37,3 +38,5 @@ jobs:
         files: ./coverage/lcov.info
         flags: unittests
         name: codecov-umbrella
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}

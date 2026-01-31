@@ -8,12 +8,15 @@
  */
 
 import { RequestHandler } from '../request-handler';
+import { PaginationMixin } from '../pagination';
 
 /**
  * Manage RBL monitored hosts
  */
-export class Hosts {
-  constructor(private handler: RequestHandler) {}
+export class Hosts extends PaginationMixin {
+  constructor(private handler: RequestHandler) {
+    super();
+  }
 
   /**
    * Get hosts or a single host
@@ -61,5 +64,12 @@ export class Hosts {
    */
   async resume(hostId: string): Promise<any> {
     return this.handler.post(`rbl/hosts/${hostId}/resume`);
+  }
+
+  /**
+   * Get the resource name for pagination
+   */
+  protected getResourceName(): string {
+    return 'hosts';
   }
 }

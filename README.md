@@ -1,6 +1,8 @@
 # Generator Labs Node.js SDK
 
 [![Tests](https://github.com/generator-labs/node-sdk/actions/workflows/tests.yml/badge.svg)](https://github.com/generator-labs/node-sdk/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/generator-labs/node-sdk/actions/workflows/codeql.yml/badge.svg)](https://github.com/generator-labs/node-sdk/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/generator-labs/node-sdk/branch/master/graph/badge.svg)](https://codecov.io/gh/generator-labs/node-sdk)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -10,6 +12,9 @@ The official Node.js SDK for the [Generator Labs](https://generatorlabs.com) API
 ## Features
 
 - Full support for Generator Labs API v4.0
+- Automatic retry logic with exponential backoff (configurable)
+- Configurable timeouts and retry behavior
+- Automatic pagination support for large result sets
 - RESTful endpoint design with proper HTTP verbs (GET, POST, PUT, DELETE)
 - RBL and DNSBL monitoring
 - Contact and contact group management
@@ -17,6 +22,7 @@ The official Node.js SDK for the [Generator Labs](https://generatorlabs.com) API
 - Monitoring profiles and sources
 - Written in TypeScript with full type definitions
 - Promise-based API with async/await support
+- axios with connection pooling
 - Compatible with Node.js 18+
 
 ## Prerequisites
@@ -47,6 +53,26 @@ yarn add generatorlabs
 
 ```javascript
 const { Client } = require('generatorlabs');
+
+// Basic initialization
+const client = new Client('your_account_sid', 'your_auth_token');
+
+// With custom configuration
+const client = new Client(
+  'your_account_sid',
+  'your_auth_token',
+  {
+    timeout: 45000,     // Request timeout in milliseconds
+    maxRetries: 5,      // Maximum retry attempts
+    retryBackoff: 2     // Backoff multiplier (2x: 1s, 2s, 4s, 8s, 16s)
+  }
+);
+```
+
+Or with TypeScript:
+
+```typescript
+import { Client, ClientConfig } from 'generatorlabs';
 
 const client = new Client('your_account_sid', 'your_auth_token');
 ```

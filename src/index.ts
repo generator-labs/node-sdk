@@ -9,5 +9,6 @@
 
 export { Client } from './client';
 export { Exception } from './exception';
+export { ClientConfig } from './config';
 export { RBL } from './api/rbl';
 export { Contact } from './api/contact';

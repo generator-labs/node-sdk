@@ -11,6 +11,7 @@ import { Exception } from './exception';
 import { RequestHandler } from './api/request-handler';
 import { RBL } from './api/rbl';
 import { Contact } from './api/contact';
+import { ClientConfig, defaultConfig } from './config';
 
 /**
  * Generator Labs API client
@@ -21,13 +22,15 @@ export class Client {
   private handler: RequestHandler;
   private _rbl?: RBL;
   private _contact?: Contact;
+  public readonly config: Required<ClientConfig>;
 
   /**
    * Initialize the Generator Labs client
    */
   constructor(
     public readonly accountSid: string,
-    public readonly authToken: string
+    public readonly authToken: string,
+    config?: ClientConfig
   ) {
     // Validate account SID
     if (!/^[A-Z]{2}[0-9a-fA-F]{32}$/.test(accountSid)) {
@@ -39,11 +42,15 @@ export class Client {
       throw new Exception(`Invalid auth token format: ${authToken}`);
     }
 
+    // Merge config with defaults
+    this.config = { ...defaultConfig, ...config };
+
     // Initialize request handler
     this.handler = new RequestHandler(
       accountSid,
       authToken,
-      'https://api.generatorlabs.com/4.0/'
+      this.config.baseURL,
+      this.config
     );
   }
 
