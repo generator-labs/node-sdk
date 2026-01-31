@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/generator-labs/node-sdk/actions/workflows/tests.yml/badge.svg)](https://github.com/generator-labs/node-sdk/actions/workflows/tests.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
-[![Node Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 The official Node.js SDK for the [Generator Labs](https://generatorlabs.com) API v4.0.
@@ -17,7 +17,7 @@ The official Node.js SDK for the [Generator Labs](https://generatorlabs.com) API
 - Monitoring profiles and sources
 - Written in TypeScript with full type definitions
 - Promise-based API with async/await support
-- Compatible with Node.js 14+
+- Compatible with Node.js 18+
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Before using this library, you must have:
 
 * A Generator Labs account - [Sign up](https://portal.generatorlabs.com/signup/) or [Login](https://portal.generatorlabs.com/login/)
 * Valid API credentials (Account SID and Auth Token) from the [Portal](https://portal.generatorlabs.com/login/)
-* Node.js >= 14.0.0
+* Node.js >= 18.0.0
 
 ## Installation
 
@@ -284,7 +284,7 @@ npm run lint
 * Migrated to TypeScript with full type definitions
 * RESTful endpoint design with proper HTTP verbs
 * Updated to use Generator Labs branding (formerly RBLTracker)
-* Minimum Node.js version bumped to 14.0.0
+* Minimum Node.js version bumped to 18.0.0
 * Replaced deprecated `request` library with `axios`
 * Added full Jest test coverage
 * Added GitHub Actions CI/CD workflow

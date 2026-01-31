@@ -38,7 +38,7 @@
   },
   "homepage": "https://generatorlabs.com",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "axios": "^1.6.0"
