@@ -324,6 +324,38 @@ try {
 }
 ```
 
+## Webhook Verification
+
+The SDK includes a helper for verifying incoming webhook signatures. Each webhook is assigned a signing secret (available in the Portal), which is used to compute an HMAC-SHA256 signature sent with every request in the `X-Webhook-Signature` header.
+
+```typescript
+import { Webhook, Exception } from 'generatorlabs';
+
+const header = req.headers['x-webhook-signature'] as string;
+const body = req.body; // raw string body
+const secret = process.env.GENERATOR_LABS_WEBHOOK_SECRET!;
+
+try {
+  const payload = Webhook.verify(body, header, secret);
+
+  // payload is the decoded event data
+  console.log(payload.event);
+
+} catch (error) {
+  // Signature verification failed
+  res.status(403).json({ error: 'Invalid signature' });
+}
+```
+
+The default timestamp tolerance is 5 minutes. You can customize it (in seconds), or pass `0` to disable:
+
+```typescript
+const payload = Webhook.verify(body, header, secret, 600);  // 10-minute tolerance
+const payload = Webhook.verify(body, header, secret, 0);    // disable timestamp check
+```
+
+See `examples/webhook-verification.ts` for a complete example.
+
 ## API Documentation
 
 Full API documentation is available at the [Generator Labs Developer Site](https://docs.generatorlabs.com/api/v4/).
