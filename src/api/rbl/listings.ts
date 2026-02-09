@@ -8,17 +8,27 @@
  */
 
 import { RequestHandler } from '../request-handler';
+import { PaginationMixin } from '../pagination';
 
 /**
  * Get current RBL listings
  */
-export class Listings {
-  constructor(private handler: RequestHandler) {}
+export class Listings extends PaginationMixin {
+  constructor(private handler: RequestHandler) {
+    super();
+  }
 
   /**
    * Get current RBL listings
    */
   async get(params?: Record<string, any>): Promise<any> {
     return this.handler.get('rbl/listings', params);
+  }
+
+  /**
+   * Get the resource name for pagination
+   */
+  protected getResourceName(): string {
+    return 'listings';
   }
 }

@@ -8,12 +8,15 @@
  */
 
 import { RequestHandler } from '../request-handler';
+import { PaginationMixin } from '../pagination';
 
 /**
  * Manage notification contacts
  */
-export class Contacts {
-  constructor(private handler: RequestHandler) {}
+export class Contacts extends PaginationMixin {
+  constructor(private handler: RequestHandler) {
+    super();
+  }
 
   /**
    * Get contacts or a single contact
@@ -75,5 +78,12 @@ export class Contacts {
    */
   async resend(contactId: string): Promise<any> {
     return this.handler.post(`contact/contacts/${contactId}/resend`);
+  }
+
+  /**
+   * Get the resource name for pagination
+   */
+  protected getResourceName(): string {
+    return 'contacts';
   }
 }

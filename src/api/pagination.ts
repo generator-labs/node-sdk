@@ -35,8 +35,8 @@ export abstract class PaginationMixin {
       allItems.push(...items);
 
       // Check if there are more pages
-      const hasMore = response.has_more || false;
-      if (!hasMore) {
+      const totalPages = response.total_pages || 1;
+      if (page >= totalPages) {
         break;
       }
 

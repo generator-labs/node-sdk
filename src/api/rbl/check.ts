@@ -19,13 +19,13 @@ export class Check {
    * Start a manual RBL check
    */
   async start(params: Record<string, any>): Promise<any> {
-    return this.handler.post('rbl/check', params);
+    return this.handler.post('rbl/check/start', params);
   }
 
   /**
    * Get the status of a manual check
    */
   async status(checkId: string, params?: Record<string, any>): Promise<any> {
-    return this.handler.get(`rbl/check/${checkId}`, params);
+    return this.handler.get(`rbl/check/status/${checkId}`, params);
   }
 }

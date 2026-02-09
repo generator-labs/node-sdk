@@ -8,12 +8,15 @@
  */
 
 import { RequestHandler } from '../request-handler';
+import { PaginationMixin } from '../pagination';
 
 /**
  * Manage contact groups
  */
-export class Groups {
-  constructor(private handler: RequestHandler) {}
+export class Groups extends PaginationMixin {
+  constructor(private handler: RequestHandler) {
+    super();
+  }
 
   /**
    * Get groups or a single group
@@ -47,5 +50,12 @@ export class Groups {
    */
   async delete(groupId: string): Promise<any> {
     return this.handler.delete(`contact/groups/${groupId}`);
+  }
+
+  /**
+   * Get the resource name for pagination
+   */
+  protected getResourceName(): string {
+    return 'groups';
   }
 }

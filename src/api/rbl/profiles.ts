@@ -8,12 +8,15 @@
  */
 
 import { RequestHandler } from '../request-handler';
+import { PaginationMixin } from '../pagination';
 
 /**
  * Manage RBL monitoring profiles
  */
-export class Profiles {
-  constructor(private handler: RequestHandler) {}
+export class Profiles extends PaginationMixin {
+  constructor(private handler: RequestHandler) {
+    super();
+  }
 
   /**
    * Get profiles or a single profile
@@ -47,5 +50,12 @@ export class Profiles {
    */
   async delete(profileId: string): Promise<any> {
     return this.handler.delete(`rbl/profiles/${profileId}`);
+  }
+
+  /**
+   * Get the resource name for pagination
+   */
+  protected getResourceName(): string {
+    return 'profiles';
   }
 }

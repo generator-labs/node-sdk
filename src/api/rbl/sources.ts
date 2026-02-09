@@ -8,12 +8,15 @@
  */
 
 import { RequestHandler } from '../request-handler';
+import { PaginationMixin } from '../pagination';
 
 /**
  * Manage RBL sources
  */
-export class Sources {
-  constructor(private handler: RequestHandler) {}
+export class Sources extends PaginationMixin {
+  constructor(private handler: RequestHandler) {
+    super();
+  }
 
   /**
    * Get sources or a single source
@@ -61,5 +64,12 @@ export class Sources {
    */
   async resume(sourceId: string): Promise<any> {
     return this.handler.post(`rbl/sources/${sourceId}/resume`);
+  }
+
+  /**
+   * Get the resource name for pagination
+   */
+  protected getResourceName(): string {
+    return 'sources';
   }
 }
