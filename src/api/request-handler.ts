@@ -80,6 +80,15 @@ export class RequestHandler {
     try {
       let response: AxiosResponse;
 
+      // Convert array values to comma-separated strings for form encoding
+      if (params) {
+        for (const key of Object.keys(params)) {
+          if (Array.isArray(params[key])) {
+            params[key] = params[key].join(',');
+          }
+        }
+      }
+
       if (method === 'GET') {
         response = await this.axiosInstance.get(url, { params });
       } else if (method === 'POST') {
