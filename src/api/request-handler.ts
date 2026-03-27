@@ -12,6 +12,7 @@ import axiosRetry from 'axios-retry';
 import { Exception } from '../exception';
 import { Client } from '../client';
 import { ClientConfig, defaultConfig } from '../config';
+import { ApiResponse, RateLimitInfo } from '../response';
 
 /**
  * HTTP request handler for the Generator Labs API
@@ -46,7 +47,16 @@ export class RequestHandler {
     // Configure retry logic with exponential backoff
     axiosRetry(this.axiosInstance, {
       retries: this.config.maxRetries,
-      retryDelay: (retryCount) => {
+      retryDelay: (retryCount, error) => {
+        // Respect Retry-After header from rate limit responses
+        const retryAfter = error?.response?.headers?.['retry-after'];
+        if (retryAfter) {
+          const seconds = parseInt(retryAfter, 10);
+          if (!isNaN(seconds) && seconds > 0) {
+            return seconds * 1000;
+          }
+        }
+
         // Exponential backoff with configurable factor
         return 1000 * this.config.retryBackoff * Math.pow(2, retryCount - 1);
       },
@@ -74,7 +84,7 @@ export class RequestHandler {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     path: string,
     params?: Record<string, any>
-  ): Promise<any> {
+  ): Promise<ApiResponse> {
     const url = `${path}.json`;
 
     try {
@@ -109,7 +119,18 @@ export class RequestHandler {
         }
       }
 
-      return response.data;
+      // Parse rate limit headers
+      let rateLimitInfo: RateLimitInfo | null = null;
+      const limitHeader = response.headers['ratelimit-limit'];
+      if (limitHeader) {
+        rateLimitInfo = {
+          limit: limitHeader,
+          remaining: parseInt(response.headers['ratelimit-remaining'] || '0', 10),
+          reset: parseInt(response.headers['ratelimit-reset'] || '0', 10)
+        };
+      }
+
+      return new ApiResponse(response.data, rateLimitInfo);
     } catch (error) {
       if (error instanceof Exception) {
         throw error;
@@ -124,28 +145,28 @@ export class RequestHandler {
   /**
    * Make a GET request
    */
-  async get(path: string, params?: Record<string, any>): Promise<any> {
+  async get(path: string, params?: Record<string, any>): Promise<ApiResponse> {
     return this.makeRequest('GET', path, params);
   }
 
   /**
    * Make a POST request
    */
-  async post(path: string, params?: Record<string, any>): Promise<any> {
+  async post(path: string, params?: Record<string, any>): Promise<ApiResponse> {
     return this.makeRequest('POST', path, params);
   }
 
   /**
    * Make a PUT request
    */
-  async put(path: string, params?: Record<string, any>): Promise<any> {
+  async put(path: string, params?: Record<string, any>): Promise<ApiResponse> {
     return this.makeRequest('PUT', path, params);
   }
 
   /**
    * Make a DELETE request
    */
-  async delete(path: string): Promise<any> {
+  async delete(path: string): Promise<ApiResponse> {
     return this.makeRequest('DELETE', path);
   }
 }
