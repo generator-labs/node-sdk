@@ -11,9 +11,12 @@
  * Base exception class for all Generator Labs SDK errors
  */
 export class Exception extends Error {
-  constructor(message: string) {
+  public readonly statusCode?: number;
+
+  constructor(message: string, statusCode?: number) {
     super(message);
     this.name = 'GeneratorLabsException';
+    this.statusCode = statusCode;
     Object.setPrototypeOf(this, Exception.prototype);
   }
 }

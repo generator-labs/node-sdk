@@ -9,6 +9,7 @@
 
 import * as http from 'http';
 import { RequestHandler } from '../src/api/request-handler';
+import { Exception } from '../src/exception';
 
 function createTestServer(
   handler: (body: string, req: http.IncomingMessage) => void
@@ -123,6 +124,75 @@ describe('RequestHandler', () => {
       } finally {
         server.close();
       }
+    });
+  });
+
+  describe('error responses', () => {
+    function createErrorServer(status: number, body: object): Promise<http.Server> {
+      return new Promise((resolve) => {
+        const server = http.createServer((_req, res) => {
+          res.writeHead(status, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(body));
+        });
+        server.listen(0, () => resolve(server));
+      });
+    }
+
+    async function expectError(status: number, body: object): Promise<Exception> {
+      const server = await createErrorServer(status, body);
+      try {
+        const handler = new RequestHandler(
+          'AC' + 'a'.repeat(32),
+          'b'.repeat(64),
+          `http://localhost:${getPort(server)}/`
+        );
+
+        let caught: unknown;
+        try {
+          await handler.get('rbl/hosts/HT11111111111111111111111111111111');
+        } catch (e) {
+          caught = e;
+        }
+
+        expect(caught).toBeInstanceOf(Exception);
+        return caught as Exception;
+      } finally {
+        server.close();
+      }
+    }
+
+    it('throws with the status_message and statusCode on 400', async () => {
+      const err = await expectError(400, {
+        status_code: 400,
+        status_message: 'Invalid host id provided.'
+      });
+      expect(err.message).toContain('Invalid host id provided.');
+      expect(err.statusCode).toBe(400);
+    });
+
+    it('throws on 404', async () => {
+      const err = await expectError(404, {
+        status_code: 404,
+        status_message: 'Not found.'
+      });
+      expect(err.statusCode).toBe(404);
+    });
+
+    it('throws on 422 with the validation message', async () => {
+      const err = await expectError(422, {
+        status_code: 422,
+        status_message: 'Validation failed.'
+      });
+      expect(err.message).toContain('Validation failed.');
+      expect(err.statusCode).toBe(422);
+    });
+
+    it('throws on 500', async () => {
+      const err = await expectError(500, {
+        status_code: 500,
+        status_message: 'Server error.'
+      });
+      expect(err.statusCode).toBe(500);
     });
   });
 });

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1]
+
+### Changed
+- Error detection now reads the API `status_code` and `status_message` fields and treats any
+  `status_code` (or HTTP status) of 400 or greater as an error, throwing `Exception` with the
+  API's `status_message`. Previously the handler only looked for a `success` flag that the v4.0
+  API does not send, so server-side errors could pass through undetected.
+- `Exception` now carries a `statusCode` property so callers can branch on the specific code.
+
 ## [2.0.0]
 
 ### Added

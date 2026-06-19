@@ -111,12 +111,18 @@ export class RequestHandler {
         throw new Exception(`Unsupported HTTP method: ${method}`);
       }
 
-      // Check for v4.0 API error response format
+      // Determine success vs failure from the API status_code (which mirrors the HTTP status).
       if (response.data && typeof response.data === 'object') {
-        if (response.data.success === false) {
-          const errorMsg = response.data.error?.message || 'Unknown API error';
-          throw new Exception(`API error: ${errorMsg}`);
+        const code =
+          typeof response.data.status_code === 'number'
+            ? response.data.status_code
+            : response.status;
+        if (code >= 400 || response.status >= 400) {
+          const errorMsg = response.data.status_message || `HTTP ${response.status} error`;
+          throw new Exception(`API error: ${errorMsg}`, code);
         }
+      } else if (response.status >= 400) {
+        throw new Exception(`HTTP ${response.status} error`, response.status);
       }
 
       // Parse rate limit headers
