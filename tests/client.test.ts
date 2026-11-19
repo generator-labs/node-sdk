@@ -79,7 +79,7 @@ describe('Client', () => {
 
   describe('version', () => {
     it('should have the correct version', () => {
-      expect(Client.VERSION).toBe('2.0.0');
+      expect(Client.VERSION).toBe('2.0.1');
     });
   });
 });

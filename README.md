@@ -31,7 +31,16 @@ The official Node.js SDK for the [Generator Labs](https://generatorlabs.com) API
   - [List Certificate Errors](#list-certificate-errors)
   - [Manage Certificate Monitors](#manage-certificate-monitors)
   - [Manage Certificate Profiles](#manage-certificate-profiles)
+  - [Check a Certificate Monitor Now](#check-a-certificate-monitor-now)
+  - [Certificate Findings](#certificate-findings)
+  - [Count Certificate Errors](#count-certificate-errors)
+- [Account](#account)
 - [Pagination](#pagination)
+- [Request Options](#request-options)
+  - [Idempotency Keys](#idempotency-keys)
+  - [Request IDs](#request-ids)
+  - [Conditional Requests](#conditional-requests)
+  - [Field Selection](#field-selection)
 - [Webhook Verification](#webhook-verification)
 - [Rate Limiting](#rate-limiting)
 - [TypeScript Support](#typescript-support)
@@ -447,6 +456,78 @@ try {
 }
 ```
 
+### Check a Certificate Monitor Now
+
+```javascript
+try {
+  // Queue a check of a monitor now, instead of waiting for its next scheduled check
+  const check = await client.cert.monitors.check('CM62944aeeee2b46d7a28221164f38976a');
+
+  console.log(check.data.status);
+} catch (err) {
+  console.error(err);
+}
+```
+
+### Certificate Findings
+
+Findings are everything the last check of each active monitor found: errors, warnings and notices, whatever the profile's alert settings. Some findings can be dismissed, and restored later.
+
+```javascript
+try {
+  // List the current findings, one entry per monitor
+  let findings = await client.cert.findings.get();
+
+  // Include the findings dismissed from each monitor
+  findings = await client.cert.findings.get({ dismissed: 1 });
+
+  // Dismiss findings on named monitors (leave "monitors" out for every monitor that has them)
+  await client.cert.findings.dismiss({
+    finding_id: ['CERT_CAA01', 'CERT_CAA02'],
+    monitors: ['CM62944aeeee2b46d7a28221164f38976a']
+  });
+
+  // Restore dismissed findings
+  await client.cert.findings.restore({ finding_id: 'CERT_CAA01' });
+} catch (err) {
+  console.error(err);
+}
+```
+
+### Count Certificate Errors
+
+```javascript
+try {
+  // The number of current certificate warnings and errors, as a number
+  const count = await client.cert.errors.count();
+
+  console.log(count);
+} catch (err) {
+  console.error(err);
+}
+```
+
+## Account
+
+```javascript
+try {
+  // The account: balance, whether scheduled checks are running, and plan usage
+  const account = await client.account.get();
+
+  // The account balance, as a number
+  const balance = await client.account.balance();
+
+  // Usage by month, for the last 3 months
+  const usage = await client.account.usage({ months: 3 });
+
+  // Pause and resume the account's scheduled checks
+  await client.account.pauseChecks();
+  await client.account.resumeChecks();
+} catch (err) {
+  console.error(err);
+}
+```
+
 ## Pagination
 
 List endpoints return paginated results. You can manually pass `page` and `page_size` parameters, or use the `getAll()` helper to automatically fetch every page and return a flat array of all items:
@@ -479,6 +560,64 @@ The `getAll()` method is available on all list endpoints:
 - `client.cert.monitors.getAll()`
 - `client.cert.profiles.getAll()`
 - `client.cert.errors.getAll()`
+
+## Request Options
+
+Every resource method takes a `RequestOptions` object as its last argument: `idempotencyKey`, `requestId`, `ifNoneMatch` and `fields`.
+
+### Idempotency Keys
+
+Requests that create something (`create`), a contact `resend` or `confirm`, the certificate monitor `delete`, and the two check requests (`rbl.check.start`, `cert.monitors.check`) are sent with an `Idempotency-Key` header. The SDK generates one key per call and sends the same key on every automatic retry of that call, so a retry after a timeout never creates, sends, bills or deletes anything twice. Pass your own key to make a repeat of the call from your code safe as well:
+
+```javascript
+const host = await client.rbl.hosts.create({
+  name: 'My Mail Server',
+  host: '192.168.1.100',
+  profile: 'RP9f8e7d6c5b4a3210fedcba9876543210',
+  contact_group: ['CG4f3e2d1c0b9a8776655443322110fedc']
+}, { idempotencyKey: 'b0e1f6a2-4d7c-4b43-9d3c-3f1c5a9f2e11' });
+
+// true when the API answered with the result of an earlier request with the same key
+console.log(host.replayed);
+```
+
+The same key with a different request is refused with a 422.
+
+### Request IDs
+
+Every response carries an `X-Request-Id`, available as `requestId` on the response and on `Exception`. Quote it when you contact support about a request. You can also send your own (1 to 64 letters, digits, `-`, `_`, `.` or `:`):
+
+```javascript
+try {
+  const hosts = await client.rbl.hosts.get(undefined, { requestId: 'my-request-1' });
+  console.log(hosts.requestId);
+} catch (err) {
+  console.error(err.statusCode, err.requestId);
+}
+```
+
+### Conditional Requests
+
+Every `GET` response carries an `ETag`. Send it back as `ifNoneMatch`: when nothing has changed the API answers `304 Not Modified`, and the response has `notModified` set and no data.
+
+```javascript
+let hosts = await client.rbl.hosts.get();
+
+const later = await client.rbl.hosts.get(undefined, { ifNoneMatch: hosts.etag });
+if (!later.notModified) {
+  hosts = later;
+}
+```
+
+### Field Selection
+
+Any `GET` takes `fields` (an array, or a comma-separated string) to keep only those keys in each object of `data`. A nested key is written with a dot. A field no object has is refused with a 422.
+
+```javascript
+const host = await client.rbl.hosts.get('HT1a2b3c4d5e6f7890abcdef1234567890', { fields: ['id', 'host', 'listed'] });
+
+const hosts = await client.rbl.hosts.get({ page_size: 50 }, { fields: 'id,host' });
+```
 
 ## Webhook Verification
 
@@ -523,7 +662,7 @@ The API enforces two layers of rate limiting:
 - **Hourly limit**: 1,000 requests per hour per application
 - **Per-second limit**: varies by endpoint — 100 RPS for read operations, 50 RPS for write operations, and 20 RPS for manual check start
 
-When a rate limit is exceeded, the API returns HTTP 429 with a `Retry-After` header indicating how many seconds to wait. The SDK automatically respects this header during retries, falling back to exponential backoff for other retryable errors.
+When a rate limit is exceeded, the API returns HTTP 429 with a `Retry-After` header indicating how many seconds to wait. The SDK automatically respects this header during retries, falling back to exponential backoff for other retryable errors. A `Retry-After` longer than 60 seconds is not waited out: the 429 is thrown as the error instead.
 
 All API responses include IETF draft rate limit headers, accessible via the `rateLimitInfo` property on every response:
 
@@ -548,7 +687,14 @@ if (response.rateLimitInfo) {
 
 ## API Structure
 
-The v4.0 API follows a RESTful design with three main resource namespaces:
+The v4.0 API follows a RESTful design with four main resource namespaces:
+
+### Account Namespace (`client.account`)
+
+- **get** - The account, its balance and plan usage
+- **balance** - The account balance
+- **usage** - Usage by month
+- **pauseChecks** / **resumeChecks** - Pause and resume the account's scheduled checks
 
 ### RBL Namespace (`client.rbl`)
 
@@ -565,8 +711,9 @@ The v4.0 API follows a RESTful design with three main resource namespaces:
 
 ### Certificate Namespace (`client.cert`)
 
-- **errors** - List certificate errors and get specific error details
-- **monitors** - List, get, create, update, delete, pause, and resume certificate monitors
+- **errors** - List and count certificate errors
+- **findings** - List, dismiss, and restore certificate findings
+- **monitors** - List, get, create, update, delete, pause, resume, and check certificate monitors
 - **profiles** - List, get, create, update, and delete certificate monitoring profiles
 
 ## TypeScript Support
@@ -615,6 +762,15 @@ npm run lint
 ```
 
 ## Release History
+
+### v2.1.0 (2026-11-19)
+* Added `client.account` (account, balance, usage, pause and resume scheduled checks)
+* Added `client.cert.findings` (list, dismiss, restore), `client.cert.monitors.check()` and `client.cert.errors.count()`
+* Added request options: `idempotencyKey`, `requestId`, `ifNoneMatch` and `fields`
+* Automatic `Idempotency-Key` on requests that create something or start a check, reused on every retry
+* Responses expose `requestId`, `etag`, `replayed` and `notModified`; `Exception` carries the `requestId`
+* A `Retry-After` longer than 60 seconds is thrown as the error, not waited out
+* Fixed 5xx and 429 responses never being retried
 
 ### v2.0.1 (2026-06-19)
 * Error detection now reads the API `status_code` and `status_message`; any `status_code` (or HTTP status) of 400 or greater throws `Exception` with the API message

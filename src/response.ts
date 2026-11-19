@@ -20,8 +20,22 @@ export interface RateLimitInfo {
 }
 
 /**
+ * Response metadata from the API response headers.
+ */
+export interface ResponseMetadata {
+  /** The X-Request-Id of the response; quote it when contacting support */
+  requestId?: string | null;
+  /** The ETag of a GET response, to send back as ifNoneMatch */
+  etag?: string | null;
+  /** True when the API answered with the result of an earlier request with the same Idempotency-Key */
+  replayed?: boolean;
+  /** True for a 304 Not Modified answer to ifNoneMatch (no data) */
+  notModified?: boolean;
+}
+
+/**
  * API response wrapper that preserves direct property access to response data
- * while also exposing rate limit information.
+ * while also exposing rate limit information and response metadata.
  *
  * All properties from the API JSON response are copied directly onto this object,
  * so existing access patterns (e.g., response.data, response.success) work unchanged.
@@ -29,10 +43,26 @@ export interface RateLimitInfo {
 export class ApiResponse {
   /** Rate limit information from response headers, or null if not present */
   readonly rateLimitInfo: RateLimitInfo | null;
+  /** The X-Request-Id of the response; quote it when contacting support */
+  readonly requestId: string | null;
+  /** The ETag of a GET response, to send back as ifNoneMatch */
+  readonly etag: string | null;
+  /** True when the API answered with the result of an earlier request with the same Idempotency-Key */
+  readonly replayed: boolean;
+  /** True for a 304 Not Modified answer to ifNoneMatch (no data) */
+  readonly notModified: boolean;
   [key: string]: any;
 
-  constructor(data: Record<string, any>, rateLimitInfo: RateLimitInfo | null) {
+  constructor(
+    data: Record<string, any>,
+    rateLimitInfo: RateLimitInfo | null,
+    metadata: ResponseMetadata = {}
+  ) {
     Object.assign(this, data);
     this.rateLimitInfo = rateLimitInfo;
+    this.requestId = metadata.requestId ?? null;
+    this.etag = metadata.etag ?? null;
+    this.replayed = metadata.replayed ?? false;
+    this.notModified = metadata.notModified ?? false;
   }
 }

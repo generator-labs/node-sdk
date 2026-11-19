@@ -9,6 +9,7 @@
 
 import { RequestHandler } from '../request-handler';
 import { Errors } from './errors';
+import { Findings } from './findings';
 import { Monitors } from './monitors';
 import { Profiles } from './profiles';
 
@@ -17,6 +18,7 @@ import { Profiles } from './profiles';
  */
 export class Cert {
   private _errors?: Errors;
+  private _findings?: Findings;
   private _monitors?: Monitors;
   private _profiles?: Profiles;
 
@@ -30,6 +32,16 @@ export class Cert {
       this._errors = new Errors(this.handler);
     }
     return this._errors;
+  }
+
+  /**
+   * Get the Findings endpoint
+   */
+  get findings(): Findings {
+    if (!this._findings) {
+      this._findings = new Findings(this.handler);
+    }
+    return this._findings;
   }
 
   /**
@@ -53,4 +65,4 @@ export class Cert {
   }
 }
 
-export { Errors, Monitors, Profiles };
+export { Errors, Findings, Monitors, Profiles };

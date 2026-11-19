@@ -9,6 +9,7 @@
 
 import { Exception } from './exception';
 import { RequestHandler } from './api/request-handler';
+import { Account } from './api/account';
 import { RBL } from './api/rbl';
 import { Contact } from './api/contact';
 import { Cert } from './api/cert';
@@ -18,9 +19,10 @@ import { ClientConfig, defaultConfig } from './config';
  * Generator Labs API client
  */
 export class Client {
-  static readonly VERSION = '2.0.0';
+  static readonly VERSION = '2.0.1';
 
   private handler: RequestHandler;
+  private _account?: Account;
   private _rbl?: RBL;
   private _contact?: Contact;
   private _cert?: Cert;
@@ -54,6 +56,16 @@ export class Client {
       this.config.baseUrl,
       this.config
     );
+  }
+
+  /**
+   * Get the Account API namespace
+   */
+  get account(): Account {
+    if (!this._account) {
+      this._account = new Account(this.handler);
+    }
+    return this._account;
   }
 
   /**

@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0]
+
+### Added
+- `client.account`: `get`, `balance`, `usage`, `pauseChecks` and `resumeChecks`.
+- `client.cert.findings`: `get`, `getAll`, `dismiss` and `restore`.
+- `client.cert.monitors.check(id)` queues a check now, and `client.cert.errors.count()` returns
+  the number of current certificate errors.
+- Request options as the last argument of every method: `idempotencyKey`, `requestId`,
+  `ifNoneMatch` and `fields`.
+- An `Idempotency-Key` is sent automatically on requests that create something or start a check
+  (creates, contact resend and confirm, certificate monitor delete, RBL check start, certificate
+  check now). It is generated once per call and reused on every retry, so a retried request is not
+  applied twice. A key you pass yourself is used instead.
+- Responses expose `requestId`, `etag`, `replayed` and `notModified`, and `Exception` carries the
+  `requestId`. A 304 answer to `ifNoneMatch` is a normal response with `notModified` set.
+
+### Changed
+- A `Retry-After` longer than 60 seconds is not waited out: the 429 is thrown as the error.
+
+### Fixed
+- Requests that failed with a 5xx or 429 status were never retried; only network errors were.
+  They are now retried with the configured backoff.
+- The `User-Agent` header reported version 2.0.0.
+
 ## [2.0.1]
 
 ### Changed

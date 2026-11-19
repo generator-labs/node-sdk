@@ -144,7 +144,8 @@ describe('RequestHandler', () => {
         const handler = new RequestHandler(
           'AC' + 'a'.repeat(32),
           'b'.repeat(64),
-          `http://localhost:${getPort(server)}/`
+          `http://localhost:${getPort(server)}/`,
+          { retryBackoff: 0.001 }
         );
 
         let caught: unknown;

@@ -12,11 +12,14 @@
  */
 export class Exception extends Error {
   public readonly statusCode?: number;
+  /** The X-Request-Id of the failed request; quote it when contacting support */
+  public readonly requestId?: string | null;
 
-  constructor(message: string, statusCode?: number) {
+  constructor(message: string, statusCode?: number, requestId?: string | null) {
     super(message);
     this.name = 'GeneratorLabsException';
     this.statusCode = statusCode;
+    this.requestId = requestId;
     Object.setPrototypeOf(this, Exception.prototype);
   }
 }

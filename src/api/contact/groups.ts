@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { RequestHandler } from '../request-handler';
+import { RequestHandler, RequestOptions } from '../request-handler';
 import { PaginationMixin } from '../pagination';
 
 /**
@@ -21,35 +21,35 @@ export class Groups extends PaginationMixin {
   /**
    * Get groups or a single group
    */
-  async get(idOrParams?: string | Record<string, any>): Promise<any> {
+  async get(idOrParams?: string | Record<string, any>, options?: RequestOptions): Promise<any> {
     if (typeof idOrParams === 'string') {
       // Get single group
-      return this.handler.get(`contact/groups/${idOrParams}`);
+      return this.handler.get(`contact/groups/${idOrParams}`, undefined, options);
     } else {
       // List groups
-      return this.handler.get('contact/groups', idOrParams);
+      return this.handler.get('contact/groups', idOrParams, options);
     }
   }
 
   /**
    * Create a new contact group
    */
-  async create(params: Record<string, any>): Promise<any> {
-    return this.handler.post('contact/groups', params);
+  async create(params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.post('contact/groups', params, options, true);
   }
 
   /**
    * Update an existing group
    */
-  async update(groupId: string, params: Record<string, any>): Promise<any> {
-    return this.handler.put(`contact/groups/${groupId}`, params);
+  async update(groupId: string, params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.put(`contact/groups/${groupId}`, params, options);
   }
 
   /**
    * Delete a group
    */
-  async delete(groupId: string): Promise<any> {
-    return this.handler.delete(`contact/groups/${groupId}`);
+  async delete(groupId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.delete(`contact/groups/${groupId}`, options);
   }
 
   /**

@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { RequestHandler } from '../request-handler';
+import { RequestHandler, RequestOptions } from '../request-handler';
 import { PaginationMixin } from '../pagination';
 
 /**
@@ -21,8 +21,8 @@ export class Listings extends PaginationMixin {
   /**
    * Get current RBL listings
    */
-  async get(params?: Record<string, any>): Promise<any> {
-    return this.handler.get('rbl/listings', params);
+  async get(params?: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.get('rbl/listings', params, options);
   }
 
   /**

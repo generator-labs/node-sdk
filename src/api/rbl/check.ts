@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { RequestHandler } from '../request-handler';
+import { RequestHandler, RequestOptions } from '../request-handler';
 
 /**
  * Perform manual RBL checks
@@ -18,14 +18,14 @@ export class Check {
   /**
    * Start a manual RBL check
    */
-  async start(params: Record<string, any>): Promise<any> {
-    return this.handler.post('rbl/check/start', params);
+  async start(params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.post('rbl/check/start', params, options, true);
   }
 
   /**
    * Get the status of a manual check
    */
-  async status(checkId: string, params?: Record<string, any>): Promise<any> {
-    return this.handler.get(`rbl/check/status/${checkId}`, params);
+  async status(checkId: string, params?: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.get(`rbl/check/status/${checkId}`, params, options);
   }
 }

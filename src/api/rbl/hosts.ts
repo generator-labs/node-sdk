@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { RequestHandler } from '../request-handler';
+import { RequestHandler, RequestOptions } from '../request-handler';
 import { PaginationMixin } from '../pagination';
 
 /**
@@ -21,49 +21,49 @@ export class Hosts extends PaginationMixin {
   /**
    * Get hosts or a single host
    */
-  async get(idOrParams?: string | Record<string, any>): Promise<any> {
+  async get(idOrParams?: string | Record<string, any>, options?: RequestOptions): Promise<any> {
     if (typeof idOrParams === 'string') {
       // Get single host
-      return this.handler.get(`rbl/hosts/${idOrParams}`);
+      return this.handler.get(`rbl/hosts/${idOrParams}`, undefined, options);
     } else {
       // List hosts
-      return this.handler.get('rbl/hosts', idOrParams);
+      return this.handler.get('rbl/hosts', idOrParams, options);
     }
   }
 
   /**
    * Create a new monitored host
    */
-  async create(params: Record<string, any>): Promise<any> {
-    return this.handler.post('rbl/hosts', params);
+  async create(params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.post('rbl/hosts', params, options, true);
   }
 
   /**
    * Update an existing host
    */
-  async update(hostId: string, params: Record<string, any>): Promise<any> {
-    return this.handler.put(`rbl/hosts/${hostId}`, params);
+  async update(hostId: string, params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.put(`rbl/hosts/${hostId}`, params, options);
   }
 
   /**
    * Delete a host
    */
-  async delete(hostId: string): Promise<any> {
-    return this.handler.delete(`rbl/hosts/${hostId}`);
+  async delete(hostId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.delete(`rbl/hosts/${hostId}`, options);
   }
 
   /**
    * Pause monitoring for a host
    */
-  async pause(hostId: string): Promise<any> {
-    return this.handler.post(`rbl/hosts/${hostId}/pause`);
+  async pause(hostId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.post(`rbl/hosts/${hostId}/pause`, undefined, options);
   }
 
   /**
    * Resume monitoring for a host
    */
-  async resume(hostId: string): Promise<any> {
-    return this.handler.post(`rbl/hosts/${hostId}/resume`);
+  async resume(hostId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.post(`rbl/hosts/${hostId}/resume`, undefined, options);
   }
 
   /**

@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { RequestHandler } from '../request-handler';
+import { RequestHandler, RequestOptions } from '../request-handler';
 import { PaginationMixin } from '../pagination';
 
 /**
@@ -21,49 +21,49 @@ export class Sources extends PaginationMixin {
   /**
    * Get sources or a single source
    */
-  async get(idOrParams?: string | Record<string, any>): Promise<any> {
+  async get(idOrParams?: string | Record<string, any>, options?: RequestOptions): Promise<any> {
     if (typeof idOrParams === 'string') {
       // Get single source
-      return this.handler.get(`rbl/sources/${idOrParams}`);
+      return this.handler.get(`rbl/sources/${idOrParams}`, undefined, options);
     } else {
       // List sources
-      return this.handler.get('rbl/sources', idOrParams);
+      return this.handler.get('rbl/sources', idOrParams, options);
     }
   }
 
   /**
    * Create a new RBL source
    */
-  async create(params: Record<string, any>): Promise<any> {
-    return this.handler.post('rbl/sources', params);
+  async create(params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.post('rbl/sources', params, options, true);
   }
 
   /**
    * Update an existing source
    */
-  async update(sourceId: string, params: Record<string, any>): Promise<any> {
-    return this.handler.put(`rbl/sources/${sourceId}`, params);
+  async update(sourceId: string, params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.put(`rbl/sources/${sourceId}`, params, options);
   }
 
   /**
    * Delete a source
    */
-  async delete(sourceId: string): Promise<any> {
-    return this.handler.delete(`rbl/sources/${sourceId}`);
+  async delete(sourceId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.delete(`rbl/sources/${sourceId}`, options);
   }
 
   /**
    * Pause a source
    */
-  async pause(sourceId: string): Promise<any> {
-    return this.handler.post(`rbl/sources/${sourceId}/pause`);
+  async pause(sourceId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.post(`rbl/sources/${sourceId}/pause`, undefined, options);
   }
 
   /**
    * Resume a source
    */
-  async resume(sourceId: string): Promise<any> {
-    return this.handler.post(`rbl/sources/${sourceId}/resume`);
+  async resume(sourceId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.post(`rbl/sources/${sourceId}/resume`, undefined, options);
   }
 
   /**

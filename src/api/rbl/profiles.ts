@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { RequestHandler } from '../request-handler';
+import { RequestHandler, RequestOptions } from '../request-handler';
 import { PaginationMixin } from '../pagination';
 
 /**
@@ -21,35 +21,35 @@ export class Profiles extends PaginationMixin {
   /**
    * Get profiles or a single profile
    */
-  async get(idOrParams?: string | Record<string, any>): Promise<any> {
+  async get(idOrParams?: string | Record<string, any>, options?: RequestOptions): Promise<any> {
     if (typeof idOrParams === 'string') {
       // Get single profile
-      return this.handler.get(`rbl/profiles/${idOrParams}`);
+      return this.handler.get(`rbl/profiles/${idOrParams}`, undefined, options);
     } else {
       // List profiles
-      return this.handler.get('rbl/profiles', idOrParams);
+      return this.handler.get('rbl/profiles', idOrParams, options);
     }
   }
 
   /**
    * Create a new monitoring profile
    */
-  async create(params: Record<string, any>): Promise<any> {
-    return this.handler.post('rbl/profiles', params);
+  async create(params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.post('rbl/profiles', params, options, true);
   }
 
   /**
    * Update an existing profile
    */
-  async update(profileId: string, params: Record<string, any>): Promise<any> {
-    return this.handler.put(`rbl/profiles/${profileId}`, params);
+  async update(profileId: string, params: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.put(`rbl/profiles/${profileId}`, params, options);
   }
 
   /**
    * Delete a profile
    */
-  async delete(profileId: string): Promise<any> {
-    return this.handler.delete(`rbl/profiles/${profileId}`);
+  async delete(profileId: string, options?: RequestOptions): Promise<any> {
+    return this.handler.delete(`rbl/profiles/${profileId}`, options);
   }
 
   /**

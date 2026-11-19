@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { RequestHandler } from '../request-handler';
+import { RequestHandler, RequestOptions } from '../request-handler';
 import { PaginationMixin } from '../pagination';
 
 /**
@@ -21,8 +21,15 @@ export class Errors extends PaginationMixin {
   /**
    * Get current certificate errors
    */
-  async get(params?: Record<string, any>): Promise<any> {
-    return this.handler.get('cert/errors', params);
+  async get(params?: Record<string, any>, options?: RequestOptions): Promise<any> {
+    return this.handler.get('cert/errors', params, options);
+  }
+
+  /**
+   * Get the number of current certificate warnings and errors
+   */
+  async count(options?: RequestOptions): Promise<number> {
+    return parseInt(await this.handler.getPlain('cert/errors/count', options), 10);
   }
 
   /**
